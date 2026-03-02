@@ -1,0 +1,187 @@
+import type { Metadata } from 'next';
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Scale,
+  MessageCircle,
+} from 'lucide-react';
+import AnimatedSection from '@/components/AnimatedSection';
+import SectionHeader from '@/components/SectionHeader';
+import ContactForm from '@/components/ContactForm';
+
+export const metadata: Metadata = {
+  title: 'Contato',
+  description:
+    'Entre em contato com Samuel Sakamoto Sociedade de Advogados em Presidente Prudente. Agende uma consulta.',
+};
+
+const contactInfo = [
+  {
+    icon: MapPin,
+    title: 'Endereço',
+    lines: [
+      'R. Francisco Machado de Campos, 393',
+      'Vila Nova',
+      'Presidente Prudente - SP',
+      'CEP 19010-300',
+    ],
+  },
+  {
+    icon: Phone,
+    title: 'Telefone / WhatsApp',
+    lines: ['(18) 3221-1222'],
+    href: 'tel:+551832211222',
+  },
+  {
+    icon: Mail,
+    title: 'E-mail',
+    lines: ['contato@samuelsakamoto.adv.br'],
+    href: 'mailto:contato@samuelsakamoto.adv.br',
+  },
+  {
+    icon: Clock,
+    title: 'Horário',
+    lines: ['Segunda a Sexta', '08:00 às 18:00'],
+  },
+];
+
+export default function ContatoPage() {
+  return (
+    <>
+      {/* Hero */}
+      <section className="pt-32 pb-20 bg-gradient-to-br from-[#060a16] via-[#0b1223] to-[#162544] relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-10 right-10 w-72 h-72 bg-gold-500 rounded-full blur-3xl" />
+        </div>
+        <div className="container-custom relative z-10">
+          <AnimatedSection>
+            <span className="inline-flex items-center gap-2 bg-gold-500/20 text-gold-400 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <MessageCircle className="w-4 h-4" />
+              Fale Conosco
+            </span>
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6">
+              Entre em <span className="text-gold-400">Contato</span>
+            </h1>
+            <p className="text-primary-200 text-lg max-w-2xl">
+              Estamos prontos para esclarecer suas dúvidas com ética e
+              profissionalismo e atendimento acolhedor.
+            </p>
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Informações de Contato */}
+      <section className="py-20 bg-white">
+        <div className="container-custom">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            {contactInfo.map((info, index) => (
+              <AnimatedSection key={info.title} delay={index * 0.1}>
+                <div className="card p-6 text-center h-full border border-secondary-100">
+                  <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <info.icon className="w-7 h-7 text-primary-500" />
+                  </div>
+                  <h3 className="font-serif font-bold text-primary-500 mb-3">
+                    {info.title}
+                  </h3>
+                  {info.lines.map((line) => (
+                    <p key={line} className="text-secondary-600 text-sm">
+                      {info.href ? (
+                        <a
+                          href={info.href}
+                          className="hover:text-gold-500 transition-colors"
+                        >
+                          {line}
+                        </a>
+                      ) : (
+                        line
+                      )}
+                    </p>
+                  ))}
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+
+          {/* Formulário e Mapa */}
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Formulário */}
+            <AnimatedSection>
+              <div className="card p-8 border border-secondary-100">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 bg-gold-500/10 rounded-lg flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-gold-500" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-serif font-bold text-primary-500">
+                      Envie uma Mensagem
+                    </h2>
+                    <p className="text-secondary-500 text-sm">
+                      Responderemos em até 24 horas úteis
+                    </p>
+                  </div>
+                </div>
+                <ContactForm />
+              </div>
+            </AnimatedSection>
+
+            {/* Mapa */}
+            <AnimatedSection delay={0.2}>
+              <div className="card border border-secondary-100 overflow-hidden h-full">
+                <div className="h-full min-h-[500px]">
+                  <iframe
+                    src="https://maps.google.com/maps?q=Samuel+Sakamoto+Sociedade+de+Advogados+R.+Francisco+Machado+de+Campos+393+Presidente+Prudente+SP&t=&z=17&ie=UTF8&iwloc=&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, minHeight: '500px' }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Localização Samuel Sakamoto Sociedade de Advogados - R. Francisco Machado de Campos, 393, Presidente Prudente"
+                    className="w-full h-full"
+                  />
+                </div>
+                {/* Barra inferior com info + botão */}
+                <div className="bg-white border-t border-secondary-100 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-gold-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-primary-500">R. Francisco Machado de Campos, 393</p>
+                      <p className="text-xs text-secondary-500">Vila Nova • Presidente Prudente - SP</p>
+                    </div>
+                  </div>
+                  <a
+                    href="https://maps.google.com/?q=Samuel+Sakamoto+Sociedade+de+Advogados+R.+Francisco+Machado+de+Campos+393+Vila+Nova+Presidente+Prudente+SP+19010-300"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary text-sm flex items-center gap-2"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    Rotas no Google Maps
+                  </a>
+                </div>
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* Aviso Legal */}
+      <section className="py-10 bg-secondary-50">
+        <div className="container-custom">
+          <div className="flex items-start gap-3 max-w-3xl mx-auto">
+            <Scale className="w-5 h-5 text-primary-500 flex-shrink-0 mt-1" />
+            <p className="text-secondary-600 text-sm">
+              <strong>Aviso Legal:</strong> O envio de mensagem por este
+              formulário não estabelece relação advogado-cliente. As informações
+              enviadas serão tratadas com confidencialidade e em conformidade com
+              a LGPD (Lei nº 13.709/2018). Este site tem caráter meramente
+              informativo, nos termos do Provimento 205/2021 da OAB.
+            </p>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

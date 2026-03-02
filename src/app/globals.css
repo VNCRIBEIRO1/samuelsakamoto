@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply font-sans text-secondary-800 bg-white;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif text-primary-500;
+  }
+
+  ::selection {
+    @apply bg-gold-500 text-white;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 
+           bg-primary-500 text-white font-medium rounded-md
+           hover:bg-primary-600 transition-all duration-300
+           focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center px-6 py-3
+           border-2 border-primary-500 text-primary-500 font-medium rounded-md
+           hover:bg-primary-500 hover:text-white transition-all duration-300
+           focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center px-6 py-3
+           bg-gold-500 text-white font-medium rounded-md
+           hover:bg-gold-600 transition-all duration-300
+           focus:outline-none focus:ring-2 focus:ring-gold-400 focus:ring-offset-2;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-serif font-bold text-primary-500 mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-lg text-secondary-600 max-w-2xl;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-md hover:shadow-xl 
+           transition-all duration-300 overflow-hidden;
+  }
+
+  .card-elevated {
+    @apply bg-white rounded-xl shadow-lg hover:shadow-2xl
+           transition-all duration-300 overflow-hidden
+           border border-secondary-100;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border border-secondary-300 rounded-md
+           focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500
+           transition-all duration-200 text-secondary-800 placeholder:text-secondary-400;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* ─── CMS Panel Utilities ─── */
+@layer components {
+  .painel-card {
+    @apply bg-[#0b1223] border border-[#1f2a40] rounded-2xl shadow-lg shadow-black/20;
+  }
+
+  .painel-card-header {
+    @apply px-6 py-4 border-b border-[#1f2a40] flex items-center justify-between;
+  }
+
+  .painel-card-body {
+    @apply divide-y divide-[#1f2a40]/50;
+  }
+
+  .painel-card-row {
+    @apply px-6 py-4 hover:bg-[#162544]/40 transition-colors;
+  }
+
+  .painel-heading {
+    @apply text-2xl md:text-3xl font-bold text-white tracking-tight;
+  }
+
+  .painel-subheading {
+    @apply text-[#93a6c8] text-sm font-medium tracking-wide;
+  }
+
+  .painel-section-title {
+    @apply text-[15px] font-semibold text-white tracking-tight;
+  }
+
+  .painel-label {
+    @apply text-sm font-medium text-[#c6d2ea] mb-1.5 block;
+  }
+
+  .painel-input {
+      @apply w-full px-4 py-2.5 bg-[#0f182b] border border-[#1f2a40] rounded-xl text-white text-sm 
+        placeholder-[#566a88] focus:outline-none focus:border-[#c1933c]/50 focus:ring-1 focus:ring-[#c1933c]/20
+           transition-all duration-200;
+  }
+
+  .painel-btn-primary {
+      @apply px-5 py-2.5 bg-gradient-to-r from-[#d1ad57] to-[#c1933c] text-white text-sm font-semibold 
+        rounded-xl hover:from-[#e4c975] hover:to-[#d1ad57] transition-all duration-200 
+        shadow-lg shadow-[#d1ad57]/15 active:scale-[0.98];
+  }
+
+  .painel-btn-outline {
+      @apply px-4 py-2 text-sm bg-[#0b1223] border border-[#1f2a40] text-[#9fb0cf] rounded-xl 
+        hover:text-white hover:border-[#c1933c]/30 transition-all duration-200;
+  }
+
+  .painel-link {
+    @apply text-[#d1ad57] hover:text-[#e4c975] transition-colors text-sm font-medium;
+  }
+
+  .painel-divider {
+    @apply border-[#1f2a40];
+  }
+}
