@@ -3,54 +3,42 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  // LICITAÇÃO PÚBLICA
-  // ============================================================
-  licitacao: {
-    saudacao:
-      'Entendido! Vamos conversar sobre *Licitação Pública*. Me conte mais sobre sua demanda para direcionarmos o atendimento adequado.',
-    perguntas: [
-      {
-        id: 'sub',
-        texto: 'Qual situação melhor descreve sua demanda em licitação?',
-        opcoes: [
-          { label: '📑 Participação em pregão', valor: 'Participação em pregão' },
-          { label: '📂 Habilitação e documentação', valor: 'Habilitação e documentação' },
-          { label: '⚖️ Impugnações e recursos', valor: 'Impugnações e recursos' },
-          { label: '🧾 Contrato administrativo', valor: 'Contrato administrativo' },
-          { label: '📋 Outro assunto em licitação', valor: 'Outro assunto em licitação' },
-        ],
-        campo: 'subarea',
-      },
-      PERGUNTA_URGENCIA,
-      {
-        id: 'documentos',
-        texto: 'Você possui edital, documentos e comunicações?',
-        opcoes: [
-          { label: '✅ Sim, tenho documentos', valor: 'Possui documentos' },
-          { label: '📂 Tenho parte dos documentos', valor: 'Documentos parciais' },
-          { label: '❌ Ainda não', valor: 'Sem documentos no momento' },
-        ],
-        campoArray: true,
-      },
-      {
-        id: 'detalhe',
-        texto: 'Descreva brevemente sua demanda em licitação:',
-        livre: true,
-        campoArray: true,
-      },
-    ],
-  },
-        ],
-        campoArray: true,
-      },
-      {
-        id: 'detalhe',
-        texto: 'Descreva brevemente sua situação previdenciária:',
-        livre: true,
-        campoArray: true,
-      },
-    ],
-  },
+  MessageCircle,
+  X,
+  Send,
+  Bot,
+  Scale,
+  ArrowLeft,
+  ExternalLink,
+  ShieldCheck,
+  AlertTriangle,
+  Clock,
+  CheckCircle,
+} from 'lucide-react';
+
+// ============================================================
+// TIPOS
+// ============================================================
+type Opcao = { label: string; valor: string };
+
+type Mensagem = {
+  id: number;
+  tipo: 'bot' | 'user';
+  texto: string;
+  opcoes?: Opcao[];
+  timestamp: Date;
+};
+
+type DadosTriagem = {
+  area: string;
+  subarea: string;
+  urgencia: string;
+  detalhes: string[];
+  nome: string;
+  telefone: string;
+};
+
+// ============================================================
 // FLUXOS POR ÁREA — PERGUNTAS CONVERSACIONAIS COMPLETAS
 // ============================================================
 type Pergunta = {
@@ -205,67 +193,53 @@ const FLUXOS: Record<string, Fluxo> = {
   },
 
   // ============================================================
-  // CIVIL
+  // DIREITO PREVIDENCIÁRIO
   // ============================================================
-  civil: {
+  previdenciario: {
     saudacao:
-      'Certo! Vamos conversar sobre sua questão de *Direito Civil*. Me conte um pouco mais para que possamos direcionar o melhor atendimento.',
+      'Certo! Vamos conversar sobre sua questão de *Direito Previdenciário*. Preciso de algumas informações para direcionar o melhor atendimento.',
     perguntas: [
       {
         id: 'sub',
-        texto: 'Qual desses temas se relaciona com sua situação?',
+        texto: 'Qual situação melhor descreve sua demanda?',
         opcoes: [
-          { label: '💔 Danos morais ou materiais', valor: 'Responsabilidade civil / danos' },
-          { label: '📝 Problemas com contratos', valor: 'Questões contratuais' },
-          { label: '🏠 Questão imobiliária (compra, venda, locação)', valor: 'Direito imobiliário' },
-          { label: '👨‍👩‍👧 Divórcio / separação', valor: 'Divórcio / separação' },
-          { label: '👶 Guarda de filhos / regulamentação de visitas', valor: 'Guarda / regulamentação de visitas' },
-          { label: '💰 Pensão alimentícia', valor: 'Pensão alimentícia' },
-          { label: '📜 Inventário / herança / testamento', valor: 'Sucessões / inventário / testamento' },
-          { label: '🛒 Direito do consumidor', valor: 'Direito do consumidor' },
-          { label: '🏥 Erro médico / hospitalar', valor: 'Responsabilidade médica / hospitalar' },
-          { label: '🚗 Acidente de trânsito (indenização)', valor: 'Acidente de trânsito (indenização)' },
-          { label: '📋 Outro assunto cível', valor: 'Outro assunto cível' },
+          { label: '🏖️ Aposentadoria (tempo, idade, especial)', valor: 'Aposentadoria' },
+          { label: '🤕 Auxílio-doença / Incapacidade temporária', valor: 'Auxílio-doença' },
+          { label: '♿ BPC/LOAS (benefício assistencial)', valor: 'BPC/LOAS' },
+          { label: '💰 Pensão por morte', valor: 'Pensão por morte' },
+          { label: '🔄 Revisão de benefício', valor: 'Revisão de benefício' },
+          { label: '❌ Benefício negado pelo INSS', valor: 'Benefício negado' },
+          { label: '📋 Outro assunto previdenciário', valor: 'Outro assunto previdenciário' },
         ],
         campo: 'subarea',
       },
       PERGUNTA_URGENCIA,
       {
-        id: 'situacao_atual',
-        texto: 'Qual a situação atual do caso?',
+        id: 'contribuicao',
+        texto: 'Qual sua situação de contribuição ao INSS?',
         opcoes: [
-          { label: '🆕 Ainda não tomei nenhuma medida', valor: 'Nenhuma medida tomada ainda' },
-          { label: '🤝 Tentei resolver amigavelmente sem sucesso', valor: 'Tentou resolver amigavelmente sem sucesso' },
-          { label: '📨 Recebi notificação / intimação', valor: 'Recebeu notificação ou intimação' },
-          { label: '⚖️ Já tenho processo judicial em andamento', valor: 'Processo judicial já em andamento' },
-          { label: '📋 Preciso apenas de orientação / consulta', valor: 'Busca orientação / consulta' },
-        ],
-        campoArray: true,
-      },
-      {
-        id: 'valor',
-        texto: 'Existe valor financeiro envolvido na questão?',
-        opcoes: [
-          { label: '💲 Até R$ 10.000', valor: 'Valor até R$ 10.000' },
-          { label: '💲💲 De R$ 10.000 a R$ 50.000', valor: 'Valor entre R$ 10.000 e R$ 50.000' },
-          { label: '💲💲💲 Acima de R$ 50.000', valor: 'Valor acima de R$ 50.000' },
-          { label: '❓ Não sei estimar / não se aplica', valor: 'Valor não estimado / não se aplica' },
+          { label: '✅ Contribuo regularmente (CLT ou autônomo)', valor: 'Contribuinte regular' },
+          { label: '⚠️ Contribuição irregular/atrasada', valor: 'Contribuição irregular' },
+          { label: '❌ Nunca contribuí', valor: 'Nunca contribuiu' },
+          { label: '🏖️ Já sou aposentado(a)', valor: 'Já aposentado(a)' },
+          { label: '❓ Não sei informar', valor: 'Não sabe informar' },
         ],
         campoArray: true,
       },
       {
         id: 'documentos',
-        texto: 'Você tem documentos relacionados ao caso?',
+        texto: 'Você possui documentos relacionados?',
         opcoes: [
-          { label: '✅ Sim, tenho documentos e contratos', valor: 'Possui documentos/contratos' },
-          { label: '📱 Tenho conversas e registros digitais', valor: 'Possui conversas/registros digitais' },
-          { label: '❌ Não tenho documentos no momento', valor: 'Sem documentos no momento' },
+          { label: '✅ Sim, tenho CNIS/carteira de trabalho', valor: 'Possui CNIS/CTPS' },
+          { label: '📄 Tenho laudos médicos', valor: 'Possui laudos médicos' },
+          { label: '📂 Tenho parte dos documentos', valor: 'Documentos parciais' },
+          { label: '❌ Ainda não', valor: 'Sem documentos no momento' },
         ],
         campoArray: true,
       },
       {
         id: 'detalhe',
-        texto: 'Conte brevemente o que aconteceu e o que você busca:',
+        texto: 'Descreva brevemente sua situação previdenciária:',
         livre: true,
         campoArray: true,
       },
@@ -273,58 +247,39 @@ const FLUXOS: Record<string, Fluxo> = {
   },
 
   // ============================================================
-  // EMPRESARIAL
+  // DIREITO DO CONSUMIDOR
   // ============================================================
-  empresarial: {
+  consumidor: {
     saudacao:
-      'Perfeito! Vamos tratar da sua questão de *Direito Empresarial*. Me ajude a entender o cenário para direcionarmos o atendimento.',
+      'Perfeito! Vamos tratar da sua questão de *Direito do Consumidor*. Me ajude a entender o cenário para direcionarmos o atendimento.',
     perguntas: [
       {
         id: 'sub',
-        texto: 'Qual é a principal necessidade?',
+        texto: 'Qual situação melhor descreve sua demanda?',
         opcoes: [
-          { label: '📝 Elaboração ou revisão de contrato', valor: 'Contratos empresariais' },
-          { label: '🏢 Abertura de empresa (constituição societária)', valor: 'Abertura de empresa' },
-          { label: '🔄 Alteração contratual / societária', valor: 'Alteração contratual / societária' },
-          { label: '⚠️ Recuperação judicial / extrajudicial', valor: 'Recuperação judicial / extrajudicial' },
-          { label: '❌ Encerramento / dissolução de empresa', valor: 'Encerramento / dissolução' },
-          { label: '🤝 Disputa entre sócios', valor: 'Conflitos societários' },
-          { label: '📊 Compliance e governança corporativa', valor: 'Compliance e governança' },
-          { label: '🔒 LGPD / proteção de dados', valor: 'LGPD / proteção de dados' },
-          { label: '📋 Cobranças / execução de títulos', valor: 'Cobranças / execução de títulos' },
-          { label: '⚖️ Ação judicial contra ou da empresa', valor: 'Ação judicial empresarial' },
-          { label: '📋 Outro assunto empresarial', valor: 'Outro assunto empresarial' },
+          { label: '💳 Cobrança indevida', valor: 'Cobrança indevida' },
+          { label: '📦 Produto com defeito', valor: 'Produto com defeito' },
+          { label: '📉 Serviço não prestado/negado', valor: 'Serviço não prestado' },
+          { label: '🧾 Cancelamento e reembolso', valor: 'Cancelamento e reembolso' },
+          { label: '🚫 Negativação indevida', valor: 'Negativação indevida' },
+          { label: '📋 Outro assunto do consumidor', valor: 'Outro assunto do consumidor' },
         ],
         campo: 'subarea',
       },
       PERGUNTA_URGENCIA,
       {
-        id: 'porte',
-        texto: 'Qual o porte da empresa?',
+        id: 'documentos',
+        texto: 'Você possui comprovantes, contratos ou conversas?',
         opcoes: [
-          { label: '🏪 MEI (Microempreendedor Individual)', valor: 'MEI' },
-          { label: '🏬 ME (Microempresa)', valor: 'ME — Microempresa' },
-          { label: '🏢 EPP (Empresa de Pequeno Porte)', valor: 'EPP' },
-          { label: '🏗️ Média ou Grande Empresa', valor: 'Média/Grande empresa' },
-          { label: '🆕 Ainda não tenho empresa', valor: 'Empresa ainda não constituída' },
-        ],
-        campoArray: true,
-      },
-      {
-        id: 'funcionarios',
-        texto: 'A empresa possui funcionários registrados?',
-        opcoes: [
-          { label: '👤 Não, sou só eu', valor: 'Sem funcionários' },
-          { label: '👥 1 a 5 funcionários', valor: '1 a 5 funcionários' },
-          { label: '👥👥 6 a 20 funcionários', valor: '6 a 20 funcionários' },
-          { label: '🏢 Mais de 20 funcionários', valor: 'Mais de 20 funcionários' },
-          { label: '❓ Não se aplica', valor: 'Não se aplica' },
+          { label: '✅ Sim, tenho documentos', valor: 'Possui documentos' },
+          { label: '📱 Tenho conversas / registros', valor: 'Possui conversas/registros' },
+          { label: '❌ Ainda não', valor: 'Sem documentos no momento' },
         ],
         campoArray: true,
       },
       {
         id: 'detalhe',
-        texto: 'Descreva brevemente sua necessidade ou situação empresarial:',
+        texto: 'Descreva brevemente o que aconteceu:',
         livre: true,
         campoArray: true,
       },
@@ -332,117 +287,38 @@ const FLUXOS: Record<string, Fluxo> = {
   },
 
   // ============================================================
-  // ADMINISTRATIVO
+  // LICITAÇÃO PÚBLICA
   // ============================================================
-  administrativo: {
+  licitacao: {
     saudacao:
-      'Entendido! Vamos conversar sobre *Direito Administrativo*. Me conte mais sobre sua demanda para direcionarmos o atendimento adequado.',
+      'Entendido! Vamos conversar sobre *Licitação Pública*. Me conte mais sobre sua demanda para direcionarmos o atendimento adequado.',
     perguntas: [
       {
         id: 'sub',
-        texto: 'Qual tema se aplica ao seu caso?',
+        texto: 'Qual situação melhor descreve sua demanda em licitação?',
         opcoes: [
-          { label: '📋 Licitações e contratos públicos', valor: 'Licitações e contratos públicos' },
-          { label: '👨‍💼 Concurso público (nomeação, recurso)', valor: 'Concurso público' },
-          { label: '⚖️ Processo administrativo disciplinar (PAD)', valor: 'Processo administrativo disciplinar' },
-          { label: '🏛️ Ação contra órgão público', valor: 'Ação contra a Administração Pública' },
-          { label: '📑 Mandado de segurança', valor: 'Mandado de segurança' },
-          { label: '💼 Servidor público (direitos e vantagens)', valor: 'Direitos do servidor público' },
-          { label: '🏗️ Desapropriação', valor: 'Desapropriação' },
-          { label: '🔒 Improbidade administrativa', valor: 'Improbidade administrativa' },
-          { label: '📋 Outro assunto administrativo', valor: 'Outro assunto administrativo' },
-        ],
-        campo: 'subarea',
-      },
-      {
-        id: 'urgencia',
-        texto: 'Existe prazo correndo (recurso, defesa, impugnação)?',
-        opcoes: [
-          { label: '🔴 Sim, prazo urgente (menos de 5 dias)', valor: 'URGENTE' },
-          { label: '🟡 Sim, mas ainda tenho alguns dias/semanas', valor: 'MODERADO' },
-          { label: '🟢 Não tenho prazo imediato', valor: 'CONSULTA' },
-          { label: '❓ Não sei informar sobre prazos', valor: 'CONSULTA' },
-        ],
-        campo: 'urgencia',
-      },
-      {
-        id: 'esfera',
-        texto: 'Em qual esfera da Administração Pública está o caso?',
-        opcoes: [
-          { label: '🏛️ Federal', valor: 'Esfera Federal' },
-          { label: '🏢 Estadual', valor: 'Esfera Estadual' },
-          { label: '🏠 Municipal', valor: 'Esfera Municipal' },
-          { label: '❓ Não tenho certeza', valor: 'Esfera não identificada' },
-        ],
-        campoArray: true,
-      },
-      {
-        id: 'posicao',
-        texto: 'Qual a sua posição na situação?',
-        opcoes: [
-          { label: '👨‍💼 Sou servidor público', valor: 'Servidor público' },
-          { label: '🏢 Sou empresário / licitante', valor: 'Empresário / licitante' },
-          { label: '👤 Sou cidadão afetado', valor: 'Cidadão afetado' },
-          { label: '📋 Outro', valor: 'Outra posição' },
-        ],
-        campoArray: true,
-      },
-      {
-        id: 'detalhe',
-        texto: 'Descreva brevemente a situação:',
-        livre: true,
-        campoArray: true,
-      },
-    ],
-  },
-
-  // ============================================================
-  // CÁLCULOS JUDICIAIS
-  // ============================================================
-  calculos: {
-    saudacao:
-      'Entendi! Vamos falar sobre *Cálculos Judiciais*. Esse serviço é essencial para garantir que seus direitos sejam corretamente quantificados.',
-    perguntas: [
-      {
-        id: 'sub',
-        texto: 'Que tipo de cálculo você precisa?',
-        opcoes: [
-          { label: '💰 Cálculos trabalhistas (rescisão, horas extras, etc.)', valor: 'Cálculos trabalhistas' },
-          { label: '📊 Liquidação de sentença', valor: 'Liquidação de sentença' },
-          { label: '🔄 Atualização monetária de valores', valor: 'Atualização monetária de valores' },
-          { label: '📈 Cálculos previdenciários', valor: 'Cálculos previdenciários' },
-          { label: '🏠 Cálculos imobiliários / locatícios', valor: 'Cálculos imobiliários / locatícios' },
-          { label: '📋 Conferência / impugnação de cálculos', valor: 'Conferência / impugnação de cálculos' },
-          { label: '📋 Outro tipo de cálculo', valor: 'Outro tipo de cálculo judicial' },
+          { label: '📑 Participação em pregão', valor: 'Participação em pregão' },
+          { label: '📂 Habilitação e documentação', valor: 'Habilitação e documentação' },
+          { label: '⚖️ Impugnações e recursos', valor: 'Impugnações e recursos' },
+          { label: '🧾 Contrato administrativo', valor: 'Contrato administrativo' },
+          { label: '📋 Outro assunto em licitação', valor: 'Outro assunto em licitação' },
         ],
         campo: 'subarea',
       },
       PERGUNTA_URGENCIA,
       {
-        id: 'processo',
-        texto: 'Já existe processo judicial em andamento?',
+        id: 'documentos',
+        texto: 'Você possui edital, documentos e comunicações?',
         opcoes: [
-          { label: '✅ Sim, com número de processo', valor: 'Processo judicial em andamento' },
-          { label: '📋 Não, é para ajuizar ação futura', valor: 'Cálculo para ação futura' },
-          { label: '🔍 É para conferência / impugnação', valor: 'Conferência / impugnação de cálculos' },
-          { label: '📊 É para negociação extrajudicial', valor: 'Para negociação extrajudicial' },
-        ],
-        campoArray: true,
-      },
-      {
-        id: 'periodo',
-        texto: 'Qual o período que precisa ser calculado?',
-        opcoes: [
-          { label: '📅 Até 1 ano', valor: 'Período de até 1 ano' },
-          { label: '📅 De 1 a 5 anos', valor: 'Período de 1 a 5 anos' },
-          { label: '📅 Mais de 5 anos', valor: 'Período superior a 5 anos' },
-          { label: '❓ Não sei precisar', valor: 'Período não identificado' },
+          { label: '✅ Sim, tenho documentos', valor: 'Possui documentos' },
+          { label: '📂 Tenho parte dos documentos', valor: 'Documentos parciais' },
+          { label: '❌ Ainda não', valor: 'Sem documentos no momento' },
         ],
         campoArray: true,
       },
       {
         id: 'detalhe',
-        texto: 'Descreva brevemente o que precisa ser calculado:',
+        texto: 'Descreva brevemente sua demanda em licitação:',
         livre: true,
         campoArray: true,
       },
@@ -470,45 +346,45 @@ const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP || '551832211222';
 const getUrgenciaMarcador = (nivel: string) => {
   switch (nivel) {
     case 'URGENTE':
-      return '[!!!]';
-    // CONSUMIDOR
-    // ============================================================
-    consumidor: {
-      saudacao:
-        'Perfeito! Vamos tratar da sua questão de *Direito do Consumidor*. Me ajude a entender o cenário para direcionarmos o atendimento.',
-      perguntas: [
-        {
-          id: 'sub',
-          texto: 'Qual situação melhor descreve sua demanda?',
-          opcoes: [
-            { label: '💳 Cobrança indevida', valor: 'Cobrança indevida' },
-            { label: '📦 Produto com defeito', valor: 'Produto com defeito' },
-            { label: '📉 Serviço não prestado/negado', valor: 'Serviço não prestado' },
-            { label: '🧾 Cancelamento e reembolso', valor: 'Cancelamento e reembolso' },
-            { label: '🚫 Negativação indevida', valor: 'Negativação indevida' },
-            { label: '📋 Outro assunto do consumidor', valor: 'Outro assunto do consumidor' },
-          ],
-          campo: 'subarea',
-        },
-        PERGUNTA_URGENCIA,
-        {
-          id: 'documentos',
-          texto: 'Você possui comprovantes, contratos ou conversas?',
-          opcoes: [
-            { label: '✅ Sim, tenho documentos', valor: 'Possui documentos' },
-            { label: '📱 Tenho conversas / registros', valor: 'Possui conversas/registros' },
-            { label: '❌ Ainda não', valor: 'Sem documentos no momento' },
-          ],
-          campoArray: true,
-        },
-        {
-          id: 'detalhe',
-          texto: 'Descreva brevemente o que aconteceu:',
-          livre: true,
-          campoArray: true,
-        },
-      ],
-    },
+      return '🔴';
+    case 'MODERADO':
+      return '🟡';
+    case 'CONSULTA':
+      return '🟢';
+    default:
+      return '⚪';
+  }
+};
+
+const getUrgenciaTexto = (nivel: string) => {
+  switch (nivel) {
+    case 'URGENTE':
+      return 'Atendimento Urgente';
+    case 'MODERADO':
+      return 'Prioridade Moderada';
+    case 'CONSULTA':
+      return 'Consulta Informativa';
+    default:
+      return 'Não informada';
+  }
+};
+
+const getUrgenciaCor = (nivel: string) => {
+  switch (nivel) {
+    case 'URGENTE':
+      return 'bg-red-100 text-red-700 border-red-300';
+    case 'MODERADO':
+      return 'bg-yellow-100 text-yellow-700 border-yellow-300';
+    case 'CONSULTA':
+      return 'bg-green-100 text-green-700 border-green-300';
+    default:
+      return 'bg-secondary-100 text-secondary-600 border-secondary-300';
+  }
+};
+
+// ============================================================
+// COMPONENTE CHATBOT
+// ============================================================
 export default function ChatBot() {
   const [aberto, setAberto] = useState(false);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
@@ -584,7 +460,6 @@ export default function ChatBot() {
     const handleAbrirChatbot = () => setAberto(true);
     window.addEventListener('abrir-chatbot', handleAbrirChatbot);
 
-    // Também escutar cliques nos botões com classe .abrir-chatbot-btn
     const handleClick = (e: Event) => {
       const target = e.target as HTMLElement;
       if (target.closest('.abrir-chatbot-btn')) {
@@ -628,7 +503,6 @@ export default function ChatBot() {
 
   // Selecionar área
   const selecionarArea = async (valor: string) => {
-    // Caso especial: Calculadora de Direitos → redirecionar
     if (valor === 'calculadora') {
       addUserMsg('🧮 Calculadora de Direitos');
       await addBotMsg(
@@ -665,7 +539,6 @@ export default function ChatBot() {
 
     const perguntaAtual = fluxo.perguntas[perguntaIdx];
 
-    // Gravar dados
     if (perguntaAtual.campo) {
       setDados((prev) => ({ ...prev, [perguntaAtual.campo!]: resposta }));
     }
@@ -679,12 +552,10 @@ export default function ChatBot() {
     const nextIdx = perguntaIdx + 1;
 
     if (nextIdx < fluxo.perguntas.length) {
-      // Próxima pergunta
       setPerguntaIdx(nextIdx);
       const prox = fluxo.perguntas[nextIdx];
       await addBotMsg(prox.texto, prox.opcoes);
     } else {
-      // Fim do fluxo → pedir nome
       setEtapa('nome');
       await addBotMsg(
         'Obrigado pelas informações! Para finalizar, qual o seu *nome completo*?'
@@ -712,7 +583,6 @@ export default function ChatBot() {
       'Perfeito! Preparei o resumo da sua consulta. Ao clicar no botão abaixo, voce sera redirecionado(a) ao *WhatsApp* com a mensagem pronta — basta enviar.'
     );
 
-    // Mensagem especial de resumo com botão
     setDigitando(true);
     setTimeout(() => {
       setDigitando(false);
@@ -729,7 +599,7 @@ export default function ChatBot() {
   };
 
   // ============================================================
-  // GERAR MENSAGEM WHATSAPP — FORMATAÇÃO PROFISSIONAL
+  // GERAR MENSAGEM WHATSAPP
   // ============================================================
   const gerarMensagemWhatsApp = () => {
     const d = dados;
@@ -737,7 +607,6 @@ export default function ChatBot() {
     const urgTexto = getUrgenciaTexto(d.urgencia);
     const dataHora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
-    // Formatar detalhes como lista limpa
     const detalhesFormatados = d.detalhes
       .map((item, idx) => {
         const parts = item.split('\n→ ');
@@ -846,7 +715,7 @@ _Enviado via Assistente Virtual do site_`.trim();
   // ============================================================
   return (
     <>
-      {/* Botão Flutuante do Chatbot — acima do WhatsApp */}
+      {/* Botão Flutuante do Chatbot */}
       <AnimatePresence>
         {!aberto && (
           <motion.button
@@ -860,16 +729,10 @@ _Enviado via Assistente Virtual do site_`.trim();
             title="Assistente Virtual"
           >
             <Scale className="w-7 h-7 text-white" />
-
-            {/* Pulse */}
             <span className="absolute inset-0 rounded-full bg-gold-400 animate-ping opacity-20" />
-
-            {/* Tooltip */}
             <span className="absolute right-full mr-3 bg-white text-secondary-700 text-sm px-4 py-2 rounded-lg shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
               Assistente Virtual
             </span>
-
-            {/* Badge de notificação */}
             <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold shadow">
               1
             </span>
@@ -888,7 +751,7 @@ _Enviado via Assistente Virtual do site_`.trim();
             className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[560px] max-h-[calc(100vh-4rem)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-secondary-200"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#0e1810] via-[#1a2e1f] to-[#0e1810] px-4 py-3 flex items-center gap-3 flex-shrink-0">
+            <div className="bg-gradient-to-r from-[#0b1223] via-[#162244] to-[#0b1223] px-4 py-3 flex items-center gap-3 flex-shrink-0">
               <div className="w-10 h-10 bg-gold-500/20 rounded-full flex items-center justify-center">
                 <Scale className="w-5 h-5 text-gold-400" />
               </div>
@@ -929,7 +792,6 @@ _Enviado via Assistente Virtual do site_`.trim();
             >
               {mensagens.map((msg) => (
                 <div key={msg.id}>
-                  {/* Mensagem especial: RESUMO */}
                   {msg.texto === '__RESUMO__' ? (
                     <div className="bg-gradient-to-br from-primary-50 to-gold-50 border border-gold-200 rounded-xl p-4 space-y-3">
                       <p className="font-semibold text-sm text-secondary-800 flex items-center gap-2">
@@ -937,7 +799,6 @@ _Enviado via Assistente Virtual do site_`.trim();
                         Resumo da Consulta
                       </p>
 
-                      {/* Badge de urgência */}
                       {dados.urgencia && (
                         <div
                           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${getUrgenciaCor(dados.urgencia)}`}
@@ -950,18 +811,10 @@ _Enviado via Assistente Virtual do site_`.trim();
                       )}
 
                       <div className="text-xs text-secondary-600 space-y-1">
-                        <p>
-                          <strong>Área:</strong> {dados.area}
-                        </p>
-                        <p>
-                          <strong>Assunto:</strong> {dados.subarea}
-                        </p>
-                        <p>
-                          <strong>Cliente:</strong> {dados.nome}
-                        </p>
-                        <p>
-                          <strong>Telefone:</strong> {dados.telefone}
-                        </p>
+                        <p><strong>Área:</strong> {dados.area}</p>
+                        <p><strong>Assunto:</strong> {dados.subarea}</p>
+                        <p><strong>Cliente:</strong> {dados.nome}</p>
+                        <p><strong>Telefone:</strong> {dados.telefone}</p>
                       </div>
                       <button
                         onClick={abrirWhatsApp}
@@ -975,7 +828,7 @@ _Enviado via Assistente Virtual do site_`.trim();
                       </button>
                       <a
                         href={`/agendamento?tipo=${encodeURIComponent(dados.area)}&nome=${encodeURIComponent(dados.nome)}&telefone=${encodeURIComponent(dados.telefone)}&assunto=${encodeURIComponent(dados.subarea)}#agendar-online`}
-                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#c9a84c] to-[#b8942e] hover:from-[#d4b55a] hover:to-[#c9a84c] text-white font-semibold text-sm py-2.5 rounded-lg transition-colors shadow"
+                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#d1ad57] to-[#c1933c] hover:from-[#d4b55a] hover:to-[#c9a84c] text-white font-semibold text-sm py-2.5 rounded-lg transition-colors shadow"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" strokeWidth={2}/><line x1="16" y1="2" x2="16" y2="6" strokeWidth={2}/><line x1="8" y1="2" x2="8" y2="6" strokeWidth={2}/></svg>
                         Agendar Consulta Online
@@ -986,9 +839,8 @@ _Enviado via Assistente Virtual do site_`.trim();
                       </p>
                     </div>
                   ) : msg.tipo === 'bot' ? (
-                    /* Mensagem do bot */
                     <div className="flex gap-2 items-start">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#1a2e1f] to-[#2d4a35] flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#162244] to-[#243b6b] flex items-center justify-center flex-shrink-0 mt-0.5">
                         <Bot className="w-3.5 h-3.5 text-gold-400" />
                       </div>
                       <div className="max-w-[85%] space-y-2">
@@ -1008,7 +860,6 @@ _Enviado via Assistente Virtual do site_`.trim();
                           />
                         </div>
 
-                        {/* Opções */}
                         {msg.opcoes && msg.id === mensagens[mensagens.length - 1]?.id && (
                           <div className="space-y-1.5">
                             {msg.opcoes.map((op) => (
@@ -1031,9 +882,8 @@ _Enviado via Assistente Virtual do site_`.trim();
                       </div>
                     </div>
                   ) : (
-                    /* Mensagem do usuário */
                     <div className="flex justify-end">
-                      <div className="max-w-[80%] bg-gradient-to-br from-[#1a2e1f] to-[#2d4a35] text-white px-3.5 py-2.5 rounded-2xl rounded-tr-sm shadow-sm">
+                      <div className="max-w-[80%] bg-gradient-to-br from-[#162244] to-[#243b6b] text-white px-3.5 py-2.5 rounded-2xl rounded-tr-sm shadow-sm">
                         <p className="text-sm leading-relaxed">{msg.texto}</p>
                       </div>
                     </div>
@@ -1044,7 +894,7 @@ _Enviado via Assistente Virtual do site_`.trim();
               {/* Indicador de digitação */}
               {digitando && (
                 <div className="flex gap-2 items-start">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#1a2e1f] to-[#2d4a35] flex items-center justify-center flex-shrink-0">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#162244] to-[#243b6b] flex items-center justify-center flex-shrink-0">
                     <Bot className="w-3.5 h-3.5 text-gold-400" />
                   </div>
                   <div className="bg-white border border-secondary-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
