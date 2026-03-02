@@ -4,7 +4,7 @@ import { hash } from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
-  const adminEmail = 'admin@cerbeleraoliveira.adv.br'
+  const adminEmail = 'admin@samuelsakamoto.adv.br'
 
   const existente = await prisma.user.findUnique({ where: { email: adminEmail } })
   if (existente) {
@@ -12,7 +12,7 @@ async function main() {
     return
   }
 
-  const senhaHash = await hash('Cerbelera@2025', 12)
+  const senhaHash = await hash('Sakamoto@2026', 12)
 
   const admin = await prisma.user.create({
     data: {
@@ -26,7 +26,7 @@ async function main() {
 
   console.log('✓ Usuário admin criado com sucesso!')
   console.log('  Email:', admin.email)
-  console.log('  Senha: Cerbelera@2025')
+  console.log('  Senha: Sakamoto@2026')
   console.log('  Role:', admin.role)
   console.log('')
   console.log('⚠  ALTERE A SENHA APÓS O PRIMEIRO LOGIN')

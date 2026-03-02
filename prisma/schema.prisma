@@ -1,6 +1,6 @@
 // ============================================================
 // SCHEMA DO BANCO DE DADOS — SISTEMA DE GESTÃO JURÍDICA
-// Cerbelera & Oliveira Advogados Associados
+// Samuel Sakamoto Sociedade de Advogados
 // ============================================================
 
 generator client {
